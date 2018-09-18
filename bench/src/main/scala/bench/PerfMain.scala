@@ -6,12 +6,11 @@ import java.util.Locale
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Queue
 import scala.collection.{SortedSet, mutable}
-import scala.scalajs.js
 
 
-object PerfMain extends js.JSApp {
+object PerfMain {
 
-  def main(): Unit = {
+  def main(args:Array[String]): Unit = {
     Locale.setDefault(Locale.US)
 
     def printRow[I: Integral](name: String, items: Seq[I]) = {
@@ -23,14 +22,16 @@ object PerfMain extends js.JSApp {
       )
     }
     // How large the collections will be in each benchmark
-    val sizes = Seq(0, 1, 4, 16, 64, 256, 1024, 4096, 16192, 65536, 262144, 1048576)
+//    val sizes = Seq(0, 1, 4, 16, 64, 256, 1024, 4096, 16192, 65536, 262144, 1048576)
+    val sizes = List.tabulate(32)(i => i+1)
     // How many times to repeat each benchmark
-    val repeats = 7
+    val repeats = 1
     // How long each benchmark runs, in millis
-    val durationMs = 2000
-    val duration = durationMs * 1000000 // to nanos
+    val durationMs = 3000L
+    val duration = durationMs * 1000000L // to nanos
     // How long a benchmark can run before we stop incrementing it
-    val cutoff = 400 * 1000 * 1000
+    val cutoffMs = 400L * 1000 * 1000
+    val cutoff = cutoffMs * 1000000L
 
     printRow("Size", sizes)
     val output = mutable.Map.empty[(String, String, Long), mutable.Buffer[Long]]
@@ -63,8 +64,7 @@ object PerfMain extends js.JSApp {
               }
               val (initCounts, initTime) = handle(run = false)
               val (runCounts, runTime) = handle(run = true)
-              //TODO: why do we substract inittime here? it is not contained in runTime...
-              val res = ((runTime.toDouble / runCounts - initTime.toDouble / initCounts)).toLong
+              val res = ((runTime.toDouble / runCounts)).toLong
               buf.append(res)
               if (res > cutoff) {
                 cutoffSizes(key) = math.min(
