@@ -1,0 +1,7 @@
+08:25:28.874 INFO  s.m.l.Main$ - Starting server in /home/felix/projects/scala-bench
+08:25:28.883 INFO  s.m.l.Main$ - Classpath: /home/felix/scalameta_lsp
+08:25:30.291 INFO  s.m.l.Formatter$ - Classloading scalafmt with 28 downloaded jars
+08:25:30.656 INFO  s.m.l.Main$ - Listening....
+08:25:30.696 INFO  s.m.l.ScalametaServices - Initialized with /home/felix/projects/scala-bench, InitializeParams(6789,/home/felix/projects/scala-bench,ClientCapabilities())
+08:25:30.779 INFO  s.m.l.ScalametaServices - Client is initialized
+09:03:06.631 INFO  s.m.l.ScalametaServices - exit(1)

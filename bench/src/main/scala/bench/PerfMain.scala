@@ -6,11 +6,13 @@ import java.util.Locale
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Queue
 import scala.collection.{SortedSet, mutable}
+import scala.scalajs.js
 
 
-object PerfMain{
+object PerfMain extends js.JSApp {
 
-  def main(args: Array[String]): Unit = {
+  def main(): Unit = {
+    Locale.setDefault(Locale.US)
 
     def printRow[I: Integral](name: String, items: Seq[I]) = {
       val width = 15
@@ -25,7 +27,8 @@ object PerfMain{
     // How many times to repeat each benchmark
     val repeats = 7
     // How long each benchmark runs, in millis
-    val duration = 2000
+    val durationMs = 2000
+    val duration = durationMs * 1000000 // to nanos
     // How long a benchmark can run before we stop incrementing it
     val cutoff = 400 * 1000 * 1000
 
@@ -48,19 +51,20 @@ object PerfMain{
               def handle(run: Boolean) = {
                 System.gc()
 
-                val start = System.currentTimeMillis()
+                val start = System.nanoTime()
                 var count = 0
-                while(System.currentTimeMillis() - start < duration){
+                while(System.nanoTime() - start < duration){
                   if (run) bench.run(size)
                   else bench.initializer(size)
                   count += 1
                 }
-                val end = System.currentTimeMillis()
+                val end = System.nanoTime()
                 (count, end - start)
               }
               val (initCounts, initTime) = handle(run = false)
               val (runCounts, runTime) = handle(run = true)
-              val res = ((runTime.toDouble / runCounts - initTime.toDouble / initCounts) * 1000000).toLong
+              //TODO: why do we substract inittime here? it is not contained in runTime...
+              val res = ((runTime.toDouble / runCounts - initTime.toDouble / initCounts)).toLong
               buf.append(res)
               if (res > cutoff) {
                 cutoffSizes(key) = math.min(
@@ -74,11 +78,11 @@ object PerfMain{
         }
       }
     }
-    import ammonite.ops._
-    write(
-      pwd/'target/"results.json",
+    // import ammonite.ops._
+    // write(
+      // pwd/'target/"results.json",
       upickle.default.write(output.mapValues(_.toList).toMap)
-    )
+    // )
   }
 }
 

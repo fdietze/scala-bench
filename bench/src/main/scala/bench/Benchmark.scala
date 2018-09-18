@@ -1,6 +1,7 @@
 package bench
 
 import scala.collection.mutable
+import scala.scalajs.js
 
 case class Benchmark(name: String,
                      cases: Benchmark.Case[_]*)
@@ -54,6 +55,15 @@ object Benchmark{
       },
       Case("Array:+", n=>n){ n =>
         var b = new Array[Object](0)
+        var i = 0
+        while(i < n){
+          b = b :+ obj
+          i += 1
+        }
+        b
+      },
+      Case("js.Array:+", n=>n){ n =>
+        var b = new js.Array[Object](0)
         var i = 0
         while(i < n){
           b = b :+ obj
@@ -157,6 +167,11 @@ object Benchmark{
         while(x.nonEmpty) x = x.tail
         x
       },
+      // Case("js.Array.tail", js.Array.fill(_)(obj)){ a =>
+      //   var x = a
+      //   while(x.nonEmpty) x = x.tail
+      //   x
+      // },
       Case("m.Buffer.remove", x => mutable.Buffer.fill(x)(obj)){ a =>
         while (a.nonEmpty) a.remove(a.length-1)
         a
@@ -187,12 +202,21 @@ object Benchmark{
       Case("Array++", x => pair(Array.fill(x)(obj))){ case (a, b) =>
         a ++ b
       },
+      // Case("js.Array++", x => pair(js.Array.fill(x)(obj))){ case (a, b) =>
+      //   a ++ b
+      // },
       Case("Array-arraycopy", x => pair(Array.fill(x)(obj))){ case (a, b) =>
         val x = new Array[Object](a.length + b.length)
         System.arraycopy(a, 0, x, 0, a.length)
         System.arraycopy(b, 0, x, a.length, b.length)
         x
       },
+      // Case("js.Array-arraycopy", x => pair(js.Array.fill(x)(obj))){ case (a, b) =>
+      //   val x = new js.Array[Object](a.length + b.length)
+      //   System.arraycopy(a, 0, x, 0, a.length)
+      //   System.arraycopy(b, 0, x, a.length, b.length)
+      //   x
+      // },
       Case("m.Buffer", x => pair(mutable.Buffer.fill(x)(obj))){ case (a, b) =>
         a.appendAll(b)
       },
@@ -263,6 +287,15 @@ object Benchmark{
         }
         last
       },
+      // Case("js.Array", js.Array.fill(_)(obj)){ a =>
+      //   var i = 0
+      //   var last = nullO
+      //   while(i < 10) {
+      //     a.foreach(last = _)
+      //     i += 1
+      //   }
+      //   last
+      // },
       Case("Array-while", x => x -> Array.fill(x)(obj)){ case (n, a) =>
         var last = nullO
         var i = 0
@@ -276,6 +309,19 @@ object Benchmark{
         }
         last
       },
+      // Case("js.Array-while", x => x -> js.Array.fill(x)(obj)){ case (n, a) =>
+      //   var last = nullO
+      //   var i = 0
+      //   while(i < 100) {
+      //     var j = 0
+      //     while(j < n){
+      //       last = a(j)
+      //       j += 1
+      //     }
+      //     i += 1
+      //   }
+      //   last
+      // },
       Case("m.Buffer", x => mutable.Buffer.fill(x)(obj)){ a =>
         var last = nullO
         var i = 0
@@ -381,6 +427,19 @@ object Benchmark{
         }
         last
       },
+      // Case("js.Array", x => x -> js.Array.fill(x)(obj)){ case (n, a) =>
+      //   var last = nullO
+      //   var i = 0
+      //   while(i < 100) {
+      //     var j = 0
+      //     while(j < n){
+      //       last = a(j)
+      //       j += 1
+      //     }
+      //     i += 1
+      //   }
+      //   last
+      // },
       Case("m.Buffer", x => x -> mutable.Buffer.fill(x)(obj)){ case (n, a) =>
         var last = nullO
         var i = 0
